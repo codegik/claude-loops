@@ -9,7 +9,9 @@ You are the **reviewer** in the engineer loop's verify stage. You did not write 
 code. Review the diff as if it were a pull request from someone else.
 
 ## Inputs you expect
-- The current loop branch. Get the diff with `git diff <default-branch>...HEAD`.
+- The change lives in the **uncommitted working tree** (the loop commits only after you
+  approve). Get the diff with `git diff <default-branch>` (add `--stat` first for an
+  overview); use `git status` to see new untracked files.
 - The goal and acceptance criteria.
 - Project conventions in `CLAUDE.md` and `memory/patterns/`.
 

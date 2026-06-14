@@ -23,8 +23,13 @@ segregated subagents under `.claude/agents/`. Persistent memory lives in `memory
 ## Rules of the loop
 
 - One goal per loop. Out-of-scope findings get parked in `memory/runs/`, not done now.
-- Never commit to the default branch. Work on `loop/<slug>`.
+- At skill start, ask once whether to create a new `loop/<slug>` feature branch or work on
+  the current branch; honor that decision for the rest of the session. Avoid committing
+  directly to the default branch unless that's the branch explicitly chosen.
 - The actor never approves its own work — verification is always a fresh subagent.
+- **No commits during the loop.** ACT and VERIFY work on the uncommitted working tree;
+  the single commit happens only after the **approver** returns APPROVED, right before
+  the push.
 - The PR opens only after the **approver** returns APPROVED. Do not merge automatically.
 - GitHub is driven by the authenticated `gh` CLI. No scheduled/automated runs for now.
 

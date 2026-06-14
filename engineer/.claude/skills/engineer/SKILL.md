@@ -14,6 +14,22 @@ The guiding principles, coding standards, and project conventions live in
 
 ---
 
+## Stage 0 — SETUP  (ask once, remember for the session)
+
+The **first** time this skill runs in a session, ask the engineer:
+
+> **Create a new feature branch for these changes, or work on the current branch?**
+
+Record the answer and **keep it for the rest of the session** — do not ask again on
+later loops in the same session.
+
+- **New branch** → Stage 3 (ACT) creates `loop/<slug>` before editing; Stage 4 pushes
+  that branch and opens a PR.
+- **Current branch** → Stage 3 commits on the branch already checked out (no new branch);
+  Stage 4 pushes the current branch as-is.
+
+---
+
 ## Stage 1 — GOAL  (the start point)
 
 The loop always begins from a single, explicit goal.
@@ -47,16 +63,22 @@ Understand the system before changing it. **No edits in this stage.**
 
 ## Stage 3 — ACT
 
-Implement the plan on an isolated branch.
+Implement the change, honoring the branch decision from Stage 0.
 
-1. **Branch.** Create a working branch off the default branch:
-   `git switch -c loop/<slug>`. Never commit directly to the default branch.
-2. Make the change in small, coherent commits. Match surrounding code style.
+1. **Branch.** Follow the SETUP decision:
+   - *New branch* → `git switch -c loop/<slug>` off the default branch before editing.
+   - *Current branch* → stay on the checked-out branch; do not create one.
+   Either way, avoid committing directly to the default branch unless the engineer
+   explicitly chose to work on it.
+2. Make the change **in the working tree only**. Match surrounding code style.
+   **Do not commit** — no `git commit` happens in this stage.
 3. Keep the change within the goal's scope — park out-of-scope findings in
    `memory/runs/<slug>.md` for a future loop.
 4. Run the build / linters / fast tests locally as you go.
 
-> Do **not** open the PR here. The PR opens only after VERIFY approves (Stage 4).
+> Do **not** commit and do **not** open the PR here. Both happen only after VERIFY
+> approves (Stage 4). If VERIFY sends the work back, keep editing the same working
+> tree and re-verify — still uncommitted.
 
 ---
 
@@ -73,10 +95,16 @@ Spawn each via the `Agent` tool and act on what they return. Run **tester** and
 3. **approver** (`.claude/agents/approver.md`) — reads both reports and the goal's
    acceptance criteria, then returns **APPROVED** or **CHANGES REQUESTED** with reasons.
 
-- If **CHANGES REQUESTED** → loop back to Stage 3 (ACT), address the findings, re-verify.
-- If **APPROVED** → push the branch and open the PR with `gh`:
-  - `git push -u origin loop/<slug>`
-  - `gh pr create --fill --base <default-branch> --head loop/<slug>`
+> Verification runs against the **uncommitted working tree** — nothing has been
+> committed yet.
+
+- If **CHANGES REQUESTED** → loop back to Stage 3 (ACT), address the findings in the
+  working tree, re-verify. Still no commit.
+- If **APPROVED** → **now** commit the approved change, then push and open the PR:
+  - `git add -A && git commit -m "<concise summary of the change>"` — a single commit
+    for the whole approved change (this is the **only** commit point in the loop).
+  - `git push -u origin <branch>`  (the `loop/<slug>` branch, or the current branch)
+  - `gh pr create --fill --base <default-branch> --head <branch>`
   - Put the goal, acceptance criteria, and a summary of the three verify reports
     in the PR body.
 
